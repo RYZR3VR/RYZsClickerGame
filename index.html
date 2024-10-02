@@ -2,10 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
     <title>RYZs Clicker Game</title>
     <link rel="icon" href="image/x-icon" href="RYZ PFP Black.png">
     <style>
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            #game, #leaderboard {
+                width: 100%;
+                margin: 0;
+            }
+        }
+
         body {
             font-family: 'Trebuchet MS';
             display: flex;
@@ -20,6 +30,10 @@
             background-attachment: fixed;
             background-position: center;
             user-select: none;
+        }
+
+        #game {
+            margin-top: 50px;
         }
 
         .container {
@@ -37,7 +51,7 @@
         }
 
         #clicker img {
-            transition: transform 0.3s;
+            transition: transform 0.15s ease-in-out;
         }
 
         #clicker img:hover {
@@ -45,7 +59,7 @@
         }
 
         #clicker img:active {
-            transform: scale(0.975);
+            transform: scale(1);
         }
 
         #showNotification {
@@ -56,7 +70,7 @@
 
         .notification {
             position: fixed;
-            top: -100px;
+            top: -105px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 153, 255, 1);
@@ -71,20 +85,6 @@
             top: 20px;
         }
 
-        .bob {
-            width: 200px;
-            animation: bob 2s ease-in-out infinite;
-        }
-
-        @keyframes bob {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
         .dropdown {
             position: relative;
             display: inline-block;
@@ -93,16 +93,27 @@
         .dropbtn {
             background-color: rgb(0, 153, 255);
             color: black;
-            padding: 16px;
-            font-size: 16px;
+            padding: 20px;
+            font-size: 25px;
             border: none;
             cursor: pointer;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.75);
+            border-radius: 15px;
+            transition: transform 0.15s ease-in-out;
+        }
+
+        .dropbtn:hover {
+            transform: scale(1.1)
+        }
+
+        .dropbtn:active {
+            transform: scale(1);
         }
 
         .dropdown-content {
             display: none;
             position: absolute;
+            left: -5px;
             background-color: white;
             min-width: 160px;
             max-height: 250px;
@@ -141,27 +152,30 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 style="font-size: xxx-large;">RYZs Clicker Game</h1>
-        <h1 style="font-size: xx-large;">Clicks: <span id="score">0</span></h1>
-        <h1 style="font-size: xx-large;">CPC: <span id="cpc">1</span></h1>
-        <button id="clicker">
-            <img src="RYZ PFP Black.png" width="300", class="bob">
-        </button>
-        <h1></h1>
-        <div class="dropdown">
-            <button class="dropbtn">Upgrades</button>
-            <div class="dropdown-content">
-                <a id="upgrade1">+1 CPC (Cost: 10)</a>
-                <a id="upgrade2">+5 CPC (Cost: 50)</a>
-                <a id="upgrade3">+25 CPC (Cost: 250)</a>
-                <a id="upgrade4">+50 CPC (Cost: 500)</a>
-                <a id="upgrade5">+100 CPC (Cost: 1000)</a>
-                <a id="upgrade6">+500 CPC (Cost: 5000)</a>
+    <audio id="backgroundMusic" src="Background Music.mp3" loop hidden autoplay></audio>
+    <div style="display: flex; flex-direction: row; gap: 50px;">
+        <div class="container">
+            <h1 style="font-size: xxx-large;">RYZs Clicker Game</h1>
+            <h1 style="font-size: xx-large;">Clicks: <span id="score">0</span></h1>
+            <h1 style="font-size: xx-large;">CPC: <span id="cpc">1</span></h1>
+            <button id="clicker">
+                <img src="RYZ PFP Black.png" width="300">
+            </button>
+            <h1></h1>
+            <div class="dropdown">
+                <button class="dropbtn">Upgrades</button>
+                <div class="dropdown-content">
+                    <a id="upgrade1">+1 CPC (Cost: 10)</a>
+                    <a id="upgrade2">+5 CPC (Cost: 50)</a>
+                    <a id="upgrade3">+25 CPC (Cost: 250)</a>
+                    <a id="upgrade4">+50 CPC (Cost: 500)</a>
+                    <a id="upgrade5">+100 CPC (Cost: 1000)</a>
+                    <a id="upgrade6">+500 CPC (Cost: 5000)</a>
+                </div>
             </div>
-        </div>
-        <div id="notification" class="notification">
-            <h4>Not Enough Score For This Upgrade</h4>
+            <div id="notification" class="notification">
+                <h4>Not Enough Score For This Upgrade</h4>
+            </div>
         </div>
     </div>
     <script>
@@ -177,7 +191,7 @@
         const upgrade5Button = document.getElementById('upgrade5');
         const upgrade6Button = document.getElementById('upgrade6');
         const notification = document.getElementById('notification');
- 
+
         clickerButton.addEventListener('click', () => 
         {
             clickerButton.disabled = true;
@@ -186,8 +200,7 @@
                 score += clickValue;
                 scoreDisplay.textContent = score;
                 clickerButton.disabled = false;
-                updateLeaderboard();
-            }, 50);
+            }, 35);
         });
 
         upgrade1Button.addEventListener('click', () => 
@@ -292,6 +305,26 @@
         document.querySelectorAll('img').forEach(img => {
             img.setAttribute('draggable', 'false');
         });
+
+        const audio = document.getElementById('backgroundMusic');
+        audio.loop = true;
+        audio.play();
+
+        function toggleMute() 
+        {
+            var audio = document.getElementById("backgroundMusic");
+            var button = document.querySelector(".mute-button");
+            if (audio.muted) 
+            {
+                audio.muted = false;
+                button.textContent = "Mute";
+            } 
+            else 
+            {
+                audio.muted = true;
+                button.textContent = "Unmute";
+            }
+        }
     </script>
 </body>
 </html>
