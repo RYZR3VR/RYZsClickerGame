@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RYZs Clicker Game</title>
+    <link rel="icon" href="image/x-icon" href="RYZ PFP Black.png">
+    <style>
+        body {
+            font-family: 'Trebuchet MS';
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+            background-image: url('Web Background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            user-select: none;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 153, 255, 0.85);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.75);
+        }
+
+        #clicker {
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        #clicker img {
+            transition: transform 0.3s;
+        }
+
+        #clicker img:hover {
+            transform: scale(1.1);
+        }
+
+        #clicker img:active {
+            transform: scale(0.975);
+        }
+
+        #showNotification {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .notification {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 153, 255, 1);
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+            transition: top 0.3s ease-in-out;
+        }
+
+        .notification.show {
+            top: 20px;
+        }
+
+        .bob {
+            width: 200px;
+            animation: bob 2s ease-in-out infinite;
+        }
+
+        @keyframes bob {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background-color: rgb(0, 153, 255);
+            color: black;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.75);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1;
+        }
+
+        .dropdown-content::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        .dropdown-content {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .dropdown-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #cccccc;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="font-size: xxx-large;">RYZs Clicker Game</h1>
+        <h1 style="font-size: xx-large;">Clicks: <span id="score">0</span></h1>
+        <h1 style="font-size: xx-large;">CPC: <span id="cpc">1</span></h1>
+        <button id="clicker">
+            <img src="RYZ PFP Black.png" width="300", class="bob">
+        </button>
+        <h1></h1>
+        <div class="dropdown">
+            <button class="dropbtn">Upgrades</button>
+            <div class="dropdown-content">
+                <a id="upgrade1">+1 CPC (Cost: 10)</a>
+                <a id="upgrade2">+5 CPC (Cost: 50)</a>
+                <a id="upgrade3">+25 CPC (Cost: 250)</a>
+                <a id="upgrade4">+50 CPC (Cost: 500)</a>
+                <a id="upgrade5">+100 CPC (Cost: 1000)</a>
+                <a id="upgrade6">+500 CPC (Cost: 5000)</a>
+            </div>
+        </div>
+        <div id="notification" class="notification">
+            <h4>Not Enough Score For This Upgrade</h4>
+        </div>
+    </div>
+    <script>
+        let score = 0;
+        let clickValue = 1;
+        const scoreDisplay = document.getElementById('score');
+        const cpcDisplay = document.getElementById('cpc');
+        const clickerButton = document.getElementById('clicker');
+        const upgrade1Button = document.getElementById('upgrade1');
+        const upgrade2Button = document.getElementById('upgrade2');
+        const upgrade3Button = document.getElementById('upgrade3');
+        const upgrade4Button = document.getElementById('upgrade4');
+        const upgrade5Button = document.getElementById('upgrade5');
+        const upgrade6Button = document.getElementById('upgrade6');
+        const notification = document.getElementById('notification');
+ 
+        clickerButton.addEventListener('click', () => 
+        {
+            clickerButton.disabled = true;
+            setTimeout(() => 
+            {
+                score += clickValue;
+                scoreDisplay.textContent = score;
+                clickerButton.disabled = false;
+                updateLeaderboard();
+            }, 50);
+        });
+
+        upgrade1Button.addEventListener('click', () => 
+        {
+            if (score >= 10)
+            {
+                score -= 10;
+                clickValue += 1;
+                scoreDisplay.textContent = score;
+                cpcDisplay.textContent = clickValue;
+            }
+            else
+            {
+                showNotification();
+            }
+        });
+
+        upgrade2Button.addEventListener('click', () => 
+        {
+            if (score >= 50)
+            {
+                score -= 50;
+                clickValue += 5;
+                scoreDisplay.textContent = score;
+                cpcDisplay.textContent = clickValue;
+            }
+            else
+            {
+                showNotification();
+            }
+        });
+
+        upgrade3Button.addEventListener('click', () => 
+        {
+            if (score >= 250)
+            {
+                score -= 250;
+                clickValue += 25;
+                scoreDisplay.textContent = score;
+                cpcDisplay.textContent = clickValue;
+            }
+            else
+            {
+                showNotification();
+            }
+        });
+
+        upgrade4Button.addEventListener('click', () => 
+        {
+            if (score >= 500)
+            {
+                score -= 500;
+                clickValue += 50;
+                scoreDisplay.textContent = score;
+                cpcDisplay.textContent = clickValue;
+            }
+            else
+            {
+                showNotification();
+            }
+        });
+        
+        upgrade5Button.addEventListener('click', () => 
+        {
+            if (score >= 1000)
+            {
+                score -= 1000;
+                clickValue += 100;
+                scoreDisplay.textContent = score;
+                cpcDisplay.textContent = clickValue;
+            }
+            else
+            {
+                showNotification();
+            }
+        });
+        
+        upgrade6Button.addEventListener('click', () => 
+        {
+            if (score >= 5000)
+            {
+                score -= 5000;
+                clickValue += 500;
+                scoreDisplay.textContent = score;
+                cpcDisplay.textContent = clickValue;
+            }
+            else
+            {
+                showNotification();
+            }
+        });
+
+        function showNotification() 
+        {
+            notification.classList.add('show');
+            setTimeout(() => 
+            {
+                notification.classList.remove('show');
+            }, 1500);
+        }
+
+        document.querySelectorAll('img').forEach(img => {
+            img.setAttribute('draggable', 'false');
+        });
+    </script>
+</body>
+</html>
