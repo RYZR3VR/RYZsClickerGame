@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RYZs Clicker</title>
+    <link rel="icon" type="image/x-icon" href="RYZ PFP.png">
+    <style>
+        body {
+            font-family: 'Trebuchet MS';
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            background: linear-gradient(115deg, #0099ff, #0040ff); /*background: url('https://wallpaperaccess.com/full/1092563.jpg') no-repeat center;*/
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        .click-counter {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 153, 255, 0.85);
+            padding: 0px 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s ease-in-out;
+            scale: 1.35;
+        }
+
+        .button {
+            background: none;
+            border: none;
+            font-size: 25px;
+            cursor: pointer;
+            transition: transform 0.1s ease-in-out;
+            user-select: none;
+        }
+
+        .button:hover {
+            transform: scale(1.1);
+        }
+
+        .button:active {
+            transform: scale(1);
+        }
+
+        h1 {
+            display: block;
+            font-size: 2em;
+            margin-block-start: 0.67em;
+            margin-block-end: 0.67em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            font-weight: bold;
+            unicode-bidi: isolate;
+            user-select: none;
+        }
+
+        header {
+            position: absolute;
+            top: 25px;
+            text-align: center;
+            font-size: xxx-large;
+            font-weight: bold;
+            color: black;
+            user-select: none;
+        }
+
+        #muteButton, #unmuteButton {
+            background: none;
+            border: none;
+            color: white;
+            top: 32.5px;
+            left: 32.5px;
+            position: absolute;
+            transition: transform 0.1s ease-in-out;
+            user-select: none;
+        }
+
+        #muteButton:hover, #unmuteButton:hover {
+            transform: scale(1.1);
+        }
+
+        #muteButton:active, #unmuteButton:active {
+            transform: scale(1);
+        }
+
+        #notification {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: black;
+            color: white;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            z-index: 1;
+            max-height: 162.5px;
+            overflow-y: scroll;
+        }
+
+        .dropdown-content::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .dropdown-content .upgradesButton:hover {
+            background-color: #dddddd;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .upgradesButton {
+            background: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            user-select: none;
+            display: block;
+        }
+
+        .buttonNoEffect {
+            background: none;
+            border: none;
+            font-size: 25px;
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <audio id="music" src="Music.mp3" loop muted></audio>
+    <button id="unmuteButton" onclick="musicmuteornot(false)"><img src="muted.png" width="35px"></button>
+    <button id="muteButton" onclick="musicmuteornot(true)" style="display: none;"><img src="unmuted.png" width="35px"></button>
+    <header>RYZs Clicker</header>
+    <audio id="clickAudio" src="Click.mp3"></audio>
+    <div class="container">
+        <div class="click-counter"></div>
+        <button class="button" id="clicker"><img src="RYZ PFP Black.png" width="300px" draggable="false"></button>
+        <h1 style="font-size: xx-large;">Clicks: <span id="score">0</span></h1>
+        <h1 style="font-size: xx-large;">CPC: <span id="cpc">1</span></h1>
+        <h1 style="font-size: xx-large;">CPS: <span id="cps">0</span></h1>
+        <div class="dropdown">
+            <button class="buttonNoEffect">Upgrades</button>
+            <div class="dropdown-content">
+                <button class="upgradesButton" onclick="handleUpgrade(50, 1, 0)">+1 CPC Cost: 50</button>
+                <button class="upgradesButton" onclick="handleUpgrade(100, 0, 1)">+1 CPS Cost: 100</button>
+                <button class="upgradesButton" onclick="handleUpgrade(150, 3, 0)">+3 CPC Cost: 150</button>
+                <button class="upgradesButton" onclick="handleUpgrade(200, 0, 2)">+2 CPS Cost: 200</button>
+                <button class="upgradesButton" onclick="handleUpgrade(250, 5, 0)">+5 CPC Cost: 250</button>
+                <button class="upgradesButton" onclick="handleUpgrade(400, 0, 4)">+4 CPS Cost: 400</button>
+                <button class="upgradesButton" onclick="handleUpgrade(500, 10, 0)">+10 CPC Cost: 500</button>
+            </div>
+        </div>
+        <h1></h1>
+    </div>
+    <div id="notification"></div>
+    <script>
+        let score = 0;
+        let clickValue = 1;
+        let clickASecondValue = 0;
+        let clicksNeeded;
+        const scoreDisplay = document.getElementById('score');
+        const cpcDisplay = document.getElementById('cpc');
+        const cpsDisplay = document.getElementById('cps');
+        const clickerButton = document.getElementById('clicker');
+        const clickAudio = document.getElementById('clickAudio');
+        const music = document.getElementById('music');
+        const unmuteButton = document.getElementById('unmuteButton');
+        const muteButton = document.getElementById('muteButton');
+        const notification = document.getElementById('notification');
+        const toggleUpgradesButton = document.getElementById('toggleUpgrades');
+        const upgradesDiv = document.getElementById('upgrades');
+        const upgradeButtons = 
+        [
+            { button: document.getElementById('upgradeButton'), cost: 50, increment: 1 },
+            { button: document.getElementById('upgradeButton2'), cost: 100, increment: 10 },
+            { button: document.getElementById('upgradeButton3'), cost: 1000, increment: 100 },
+            { button: document.getElementById('upgradeButton4'), cost: 10000, increment: 1000 },
+            { button: document.getElementById('upgradeButton5'), cost: 100000, increment: 10000 },
+            { button: document.getElementById('upgradeButton6'), cost: 1000000, increment: 100000 }
+        ];
+
+        clickerButton.addEventListener('mousedown', () => 
+        {
+            clickerButton.disabled = true;
+            setTimeout(() => 
+            {
+                score += clickValue;
+                scoreDisplay.textContent = score;
+                clickerButton.disabled = false;
+                if (!clickAudio.paused)
+                {
+                    clickAudio.cloneNode(true).play();
+                }
+                else
+                {
+                    clickAudio.play();
+                }
+        
+            }, 35);
+        });
+
+        function handleUpgrade(cost, cpc, cps)
+        {
+            clicksNeeded = cost - score;
+            if (score >= cost)
+            {
+                score -= cost;
+                clickValue += cpc;
+                clickASecondValue += cps;
+                scoreDisplay.textContent = score;
+                cpcDisplay.textContent = clickValue;
+                cpsDisplay.textContent = clickASecondValue;
+            }
+            else 
+            {
+                showNotification('You Need ' + clicksNeeded + ' More ' + (clicksNeeded === 1 ? 'Click ' : 'Clicks') + ' To Purchase This');
+            }
+        }
+
+        function autoClicker()
+        {
+            score += clickASecondValue;
+            scoreDisplay.textContent = score;
+        }
+
+        setInterval(autoClicker, 1000);
+
+        function musicmuteornot(muted = true) 
+        {
+            if (muted == true)
+            {
+                music.pause();
+                muteButton.style.display = 'none';
+                unmuteButton.style.display = 'inline';
+            }
+            if (muted == false)
+            {
+                music.volume = 0.75;
+                music.play();
+                music.muted = false;
+                muteButton.style.display = 'inline';
+                unmuteButton.style.display = 'none';
+            }
+        };
+
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 1500);
+        }
+
+        function toggleUpgrades()
+        {
+            if (upgradesDiv.classList.contains('hidden'))
+            {
+                upgradesDiv.classList.remove('hidden');
+                toggleUpgradesButton.textContent = 'Hide Upgrades';
+            }
+            else
+            {
+                upgradesDiv.classList.add('hidden');
+                toggleUpgradesButton.textContent = 'Show Upgrades';
+            }
+        };
+
+        document.querySelectorAll('img').forEach(img => {
+            img.setAttribute('draggable', 'false');
+        });
+    </script>
+</body>
+</html>
